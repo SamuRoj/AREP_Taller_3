@@ -11,25 +11,20 @@ import static edu.escuelaing.arep.http.HttpServer.staticFiles;
 public class WebApplication {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        staticFiles("/newFolder");
-
-        get("/hello", (req, res) -> "Hello World!");
-
-        get("/greeting", (req, res) -> {
-            return "Hello " + req.getValues("name");
-        });
-
-        get("/pi", (req, res) -> {
-            return String.valueOf(Math.PI);
-        });
-
-        get("/e", (req, res) -> {
-            return String.valueOf(Math.E);});
-
+        loadComponents();
         HttpServer.start(args);
     }
 
-    static void changeDirectory(String path){
-        staticFiles(path);
+    /**
+     * Load everything from the controller package from the disk
+     * The get method should add to the map a Method object and invoke it. Now the lambdas doesn't apply?
+     * I have to use the get method of httpServer
+     */
+    private static void loadComponents(){
+
+    }
+
+    public static void changeFolder(String folder){
+        HttpServer.staticFiles(folder);
     }
 }

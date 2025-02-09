@@ -1,4 +1,4 @@
-package edu.escuelaing.arep.http;
+package edu.escuelaing.arep.model;
 
 public class Activity {
     private String time;

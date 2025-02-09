@@ -2,7 +2,7 @@ function addActivity(){
     const time = document.getElementById("time").value;
     const activity = document.getElementById("activity").value;
 
-    const url = "/app/activity?time=" + time + "&activity=" + activity;
+    const url = "/app/post/activities?time=" + time + "&activity=" + activity;
 
     fetch(url, { method: 'POST' })
         .then(response => {
@@ -19,7 +19,7 @@ function addActivity(){
 }
 
 function getActivities(){
-    let url = "/app/activity";
+    let url = "/app/get/activities";
 
     fetch (url, {method: 'GET'}).then(response => {
         if (!response.ok) {
@@ -52,7 +52,7 @@ function getActivities(){
 
             deleteButton.addEventListener('click', () => {
                 const time = row.querySelector('td:first-child').textContent;
-                let url = "/app/activity?time=" + time;
+                let url = "/app/delete/activities?time=" + time;
                 fetch(url, {method: 'DELETE'})
                 .then(response => {
                     if (!response.ok) {

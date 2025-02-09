@@ -2,7 +2,6 @@ package edu.escuelaing.arep.controller;
 
 import edu.escuelaing.arep.WebApplication;
 import edu.escuelaing.arep.annotations.GetMapping;
-import edu.escuelaing.arep.annotations.PostMapping;
 import edu.escuelaing.arep.annotations.RequestParam;
 import edu.escuelaing.arep.annotations.RestController;
 
@@ -15,7 +14,7 @@ public class ServerController {
     }
 
     @GetMapping("/greeting")
-    public static String greeting(@RequestParam(value = "name", defaultValue = "Samuel") String name) {
+    public static String greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
         return "Hello " + name;
     }
 

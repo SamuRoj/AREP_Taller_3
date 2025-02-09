@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class HttpRequestTest {
     private static HttpRequest httpRequest;
@@ -21,6 +22,6 @@ public class HttpRequestTest {
 
     @Test
     public void shouldNotRetrieveParams() {
-        assertEquals("Not Found.", httpRequest.getValues("age"));
+        assertNull(httpRequest.getValues("age"));
     }
 }

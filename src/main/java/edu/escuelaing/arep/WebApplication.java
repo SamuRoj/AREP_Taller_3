@@ -1,27 +1,60 @@
 package edu.escuelaing.arep;
 
+import edu.escuelaing.arep.annotations.*;
 import edu.escuelaing.arep.http.HttpServer;
 
-import java.io.IOException;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-import static edu.escuelaing.arep.http.HttpServer.get;
-import static edu.escuelaing.arep.http.HttpServer.staticFiles;
+import static edu.escuelaing.arep.http.HttpServer.*;
 
 public class WebApplication {
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws Exception {
         loadComponents();
-        HttpServer.start(args);
+        HttpServer.staticFiles("/static");
+        HttpServer.start();
     }
 
-    /**
-     * Load everything from the controller package from the disk
-     * The get method should add to the map a Method object and invoke it. Now the lambdas doesn't apply?
-     * I have to use the get method of httpServer
-     */
-    private static void loadComponents(){
+    private static void loadComponents() throws URISyntaxException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+        // Loading the files from the hard drive
+        String packageName = "edu.escuelaing.arep.controller";
+        String path = packageName.replace('.', '/');
+        URL url = ClassLoader.getSystemResource(path);
+        File directory = new File(url.toURI());
+        List<Class<?>> classes = new ArrayList<>();
 
+        for (File file : directory.listFiles()) {
+            if (file.getName().endsWith(".class")) {
+                String className = packageName + '.' + file.getName().replace(".class", "");
+                classes.add(Class.forName(className));
+            }
+        }
+
+        // Going through the classes and loading the methods in them
+        for(Class<?> c : classes){
+            if(c.isAnnotationPresent(RestController.class)){
+                for(Method m : c.getDeclaredMethods()){
+                    if(m.isAnnotationPresent(GetMapping.class)){
+                        GetMapping a = m.getAnnotation(GetMapping.class);
+                        get(a.value(), m);
+                    }
+                    else if(m.isAnnotationPresent(PostMapping.class)){
+                        PostMapping a = m.getAnnotation(PostMapping.class);
+                        get(a.value(), m);
+                    }
+                    else if(m.isAnnotationPresent(DeleteMapping.class)){
+                        DeleteMapping a = m.getAnnotation(DeleteMapping.class);
+                        get(a.value(), m);
+                    }
+                }
+            }
+        }
     }
 
     public static void changeFolder(String folder){

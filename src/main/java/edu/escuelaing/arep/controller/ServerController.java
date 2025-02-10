@@ -1,6 +1,7 @@
 package edu.escuelaing.arep.controller;
 
-import edu.escuelaing.arep.WebApplication;
+import edu.escuelaing.arep.annotations.PostMapping;
+import edu.escuelaing.arep.http.HttpServer;
 import edu.escuelaing.arep.annotations.GetMapping;
 import edu.escuelaing.arep.annotations.RequestParam;
 import edu.escuelaing.arep.annotations.RestController;
@@ -18,11 +19,6 @@ public class ServerController {
         return "Hello " + name;
     }
 
-//    @GetMapping("/static")
-//    public static void changeFolder(@RequestParam(value = "folder", defaultValue = "12:00 AM") String folder) {
-//        WebApplication.changeFolder(folder);
-//    }
-
     @GetMapping("/pi")
     public static String pi() {
         return Double.toString(Math.PI);
@@ -31,5 +27,10 @@ public class ServerController {
     @GetMapping("/e")
     public static String e() {
         return Double.toString(Math.E);
+    }
+
+    @PostMapping("/folder")
+    public static void changeFolder(@RequestParam(value = "folder", defaultValue = "/static") String folder) {
+        HttpServer.staticFiles(folder);
     }
 }

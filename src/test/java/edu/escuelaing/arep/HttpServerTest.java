@@ -1,5 +1,6 @@
 package edu.escuelaing.arep;
 
+import edu.escuelaing.arep.http.HttpRequest;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +16,8 @@ public class HttpServerTest {
     public void shouldObtainFile() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            String response = HttpServer.obtainFile("/wallpaper.jpeg", outputStream);
+            HttpRequest req = new HttpRequest("/wallpaper.jpeg", "");
+            String response = HttpServer.obtainFile(req, outputStream);
             assertEquals("HTTP/1.1 200 OK\r\n" +
                     "Content-Type: image/jpeg\r\n" +
                     "\r\n", response);
@@ -28,7 +30,8 @@ public class HttpServerTest {
     public void shouldNotObtainFile() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            HttpServer.obtainFile("/page.html", outputStream);
+            HttpRequest req = new HttpRequest("/page.html", "");
+            HttpServer.obtainFile(req, outputStream);
 
         } catch (IOException e) {
             assertTrue(true);

@@ -17,7 +17,7 @@ public class WebApplication {
 
     public static void main(String[] args) throws Exception {
         loadComponents();
-        HttpServer.staticFiles("/static");
+        HttpServer.staticFiles("static");
         HttpServer.start();
     }
 
@@ -55,9 +55,5 @@ public class WebApplication {
                 }
             }
         }
-    }
-
-    public static void changeFolder(String folder){
-        HttpServer.staticFiles(folder);
     }
 }

@@ -5,7 +5,6 @@ import edu.escuelaing.arep.model.Activity;
 import edu.escuelaing.arep.model.Pair;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -13,21 +12,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpServer {
 
     private static List<Activity> activities = new ArrayList<>();
     private static final int PORT = 23727;
-    private static String route = "target/classes";
-    private static Map<String, Pair<Method, Map<String, String>>> services= new HashMap();
+    private static String route = "target/classes/";
+    private static Map<String, Pair<Method, LinkedHashMap<String, String>>> services= new HashMap();
+    private static boolean isRunning = true;
 
     public static void start() throws IOException, URISyntaxException, InvocationTargetException, IllegalAccessException {
         ServerSocket serverSocket = new ServerSocket(PORT);
-        boolean isRunning = true;
         System.out.println("Server started through port " + PORT);
         while(isRunning){
             Socket clientSocket = serverSocket.accept();
@@ -47,33 +43,33 @@ public class HttpServer {
 
             URI resourceURI = new URI(file);
             HttpRequest req = new HttpRequest(resourceURI.getPath(), resourceURI.getQuery());
-            HttpResponse res = new HttpResponse();
-            String outputLine = processRequest(req, res, clientSocket.getOutputStream());
-            out.println(outputLine);
+            HttpResponse res = new HttpResponse(out);
+            if (req.getPath().startsWith("/app")) processRequest(req, res);
+            else out.println(obtainFile(req, clientSocket.getOutputStream()));
             in.close();
+            out.close();
             clientSocket.close();
         }
         serverSocket.close();
     }
 
-    static String processRequest(HttpRequest req, HttpResponse res, OutputStream out) throws IOException, InvocationTargetException, IllegalAccessException {
-        if (req.getPath().startsWith("/app")) return answerRequest(req, res);
-        else return obtainFile(req.getPath(), out);
-    }
-
-    static String answerRequest(HttpRequest req, HttpResponse res) throws InvocationTargetException, IllegalAccessException {
-        Pair<Method, Map<String, String>> service = services.get(req.getPath());
+    static void processRequest(HttpRequest req, HttpResponse res) throws InvocationTargetException, IllegalAccessException {
+        Pair<Method, LinkedHashMap<String, String>> service = services.get(req.getPath());
         Method method = service.getFirst();
-        Map<String, String> params = service.getSecond();
+        LinkedHashMap<String, String> params = service.getSecond();
         String ans = "";
         ArrayList<String> keys = new ArrayList<>(params.keySet());
-        String header ="HTTP/1.1 200 OK\r\n"
-                + "Content-Type: application/json\r\n"
-                + "\r\n";
+        String header ="HTTP/1.1 200 OK\r\n,"
+                + "Content-Type: application/json\r\n\r\n,";
 
-        if(req.getPath().contains("greeting")){
+        if(req.getPath().contains("greeting") ){
             String name = req.getValues(keys.get(0)) != null ? req.getValues(keys.get(0)) : params.get(keys.get(0));
             ans = "{\"response\":\""+ method.invoke(null, name) +"\"}";
+        }
+        else if(req.getPath().contains("folder")){
+            String folder = req.getValues(keys.get(0)) != null ? req.getValues(keys.get(0)) : params.get(keys.get(0));
+            method.invoke(null, folder);
+            ans = "{\"response\":\" Folder has been changed to " + route +"\"}";
         }
         else if(req.getPath().contains("get/activities")){
             ans = (String) method.invoke(null);
@@ -84,17 +80,19 @@ public class HttpServer {
             header = (String) method.invoke(null, time, name);
         }
         else if(req.getPath().contains("delete/activities")){
-            String time = req.getValues("time") != null ? req.getValues("time") : params.get("time");
+            String time = req.getValues(keys.get(0)) != null ? req.getValues(keys.get(0)) : params.get(keys.get(0));
             header = (String) method.invoke(null, time);
         }
         else{
             ans = "{\"response\":\""+ method.invoke(null) +"\"}";
         }
 
-        return header + ans;
+        res.parseValues(header + ans);
+        res.send();
     }
 
-    public static String obtainFile(String path, OutputStream out) throws IOException {
+    public static String obtainFile(HttpRequest req, OutputStream out) throws IOException {
+        String path = req.getPath();
         String file = path.equals("/") ? "index.html" : path.split("/")[1];
         String extension = file.split("\\.")[1];
         String header = obtainContentType(extension);
@@ -143,7 +141,7 @@ public class HttpServer {
             out.write(response.getBytes());
             out.write(imageBytes);
         }
-        out.write(("HTTP/1.1 404 Not Found\r\n"
+        else out.write(("HTTP/1.1 404 Not Found\r\n"
                 + "Content-Type: text/plain\r\n"
                 + "\r\n").getBytes());
     }
@@ -157,18 +155,18 @@ public class HttpServer {
     }
 
     public static void get(String route, Method method){
-        Map<String, String> parameters = new HashMap<>();
+        LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
         for(Parameter p : method.getParameters()){
             if(p.isAnnotationPresent(RequestParam.class)){
                 RequestParam a = p.getAnnotation(RequestParam.class);
                 parameters.put(a.value(), a.defaultValue());
             }
         }
-        Pair<Method, Map<String, String>> methodPair = new Pair<>(method, parameters);
+        Pair<Method, LinkedHashMap<String, String>> methodPair = new Pair<>(method, parameters);
         services.put("/app" + route, methodPair);
     }
 
     public static void staticFiles(String path){
-        route = "target/classes" + path;
+        route = "target/classes/" + path;
     }
 }

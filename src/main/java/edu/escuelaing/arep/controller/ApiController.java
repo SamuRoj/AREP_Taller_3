@@ -37,9 +37,8 @@ public class ApiController {
         List<Activity> newActivities = HttpServer.getActivities();
         newActivities.add(new Activity(time, activity));
         HttpServer.setActivities(newActivities);
-        return "HTTP/1.1 201 Accepted\r\n"
-                + "Content-Type: text/plain\r\n"
-                + "\r\n";
+        return "HTTP/1.1 201 Accepted\r\n,"
+                + "Content-Type: text/plain\r\n\r\n,";
     }
 
     @DeleteMapping("/delete/activities")
@@ -48,8 +47,7 @@ public class ApiController {
         List<Activity> newActivities = HttpServer.getActivities();
         newActivities.removeIf(condition);
         HttpServer.setActivities(newActivities);
-        return "HTTP/1.1 201 Accepted\r\n"
-                + "Content-Type: text/plain\r\n"
-                + "\r\n";
+        return "HTTP/1.1 201 Accepted\r\n,"
+                + "Content-Type: text/plain\r\n\r\n,";
     }
 }

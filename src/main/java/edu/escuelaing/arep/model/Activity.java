@@ -10,7 +10,7 @@ public class Activity {
     }
 
     public String getTime() {
-        return time;
+        return this.time;
     }
 
     public void setTime(String time) {
@@ -18,18 +18,10 @@ public class Activity {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Activity{" +
-                "time='" + time + '\'' +
-                ", name='" + name + '\'' +
-                '}';
     }
 }

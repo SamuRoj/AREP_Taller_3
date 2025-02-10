@@ -26,12 +26,4 @@ public class HttpRequest {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "HttpRequest{" +
-                "path='" + path + '\'' +
-                ", query='" + query + '\'' +
-                '}';
-    }
 }

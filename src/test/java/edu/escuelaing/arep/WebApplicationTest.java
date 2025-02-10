@@ -1,8 +1,6 @@
 package edu.escuelaing.arep;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.net.URL;
@@ -17,7 +15,7 @@ public class WebApplicationTest {
     @BeforeAll
     public static void setup() throws InterruptedException {
         // Starting the web server as a Thread
-        Thread webApp = new Thread(() -> {
+        webApp = new Thread(() -> {
             try {
                 String[] args = {};
                 WebApplication.main(args);
@@ -31,10 +29,8 @@ public class WebApplicationTest {
 
     @AfterAll
     public static void endServer() throws InterruptedException {
-        if (webApp != null && webApp.isAlive()) {
-            webApp.interrupt();
-            webApp.join();
-        }
+        webApp.interrupt();
+        webApp.join();
     }
 
     @Test
@@ -223,58 +219,128 @@ public class WebApplicationTest {
         }
     }
 
-//    @Test
-//    public void shouldChangeDirectory() {
-//        try {
-//            // Ending the server before querying it
-//            if (webApp != null && webApp.isAlive()) {
-//                webApp.interrupt();
-//                webApp.join();
-//            }
-//
-//            // Starting the web server as a Thread
-//            Thread webApp = new Thread(() -> {
-//                try {
-//                    String[] args = {};
-//                    WebApplication.main(args);
-//                    WebApplication.changeDirectory("/newFolder");
-//                } catch (Exception e) {
-//                    fail();
-//                }
-//            });
-//            webApp.start();
-//            Thread.sleep(1000);
-//
-//            String inputLine;
-//
-//            // Reading the file
-//            StringBuilder fileContent = new StringBuilder();
-//            try {
-//                BufferedReader in = new BufferedReader(new FileReader(("target/classes/newFolder/index.html")));
-//                while((inputLine = in.readLine()) != null){
-//                    fileContent.append(inputLine);
-//                    if (!in.ready()) break;
-//                }
-//                in.close();
-//            } catch (FileNotFoundException e) {
-//                fail();
-//            }
-//
-//            // Reading the response from the URL
-//            URL localhost = new URL("http://localhost:23727/");
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(localhost.openStream()));
-//            StringBuilder response = new StringBuilder();
-//            while ((inputLine = reader.readLine()) != null) {
-//                response.append(inputLine);
-//                if (!reader.ready()) break;
-//            }
-//            reader.close();
-//            // Assertion
-//            assertEquals(fileContent.toString(), response.toString());
-//        } catch (IOException e) {
-//            fail();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Test
+    public void shouldChangeDirectory() {
+        try {
+            String inputLine;
+
+            // Reading the file
+            StringBuilder fileContent = new StringBuilder();
+            try {
+                BufferedReader in = new BufferedReader(new FileReader(("target/classes/newFolder/index.html")));
+                while((inputLine = in.readLine()) != null){
+                    fileContent.append(inputLine);
+                    if (!in.ready()) break;
+                }
+                in.close();
+            } catch (FileNotFoundException e) {
+                fail();
+            }
+
+            // Changing the folder
+            URL localhost = new URL("http://localhost:23727/app/folder?folder=newFolder");
+            localhost.openStream();
+
+            // Reading the response from the URL
+            localhost = new URL("http://localhost:23727/");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(localhost.openStream()));
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = reader.readLine()) != null) {
+                response.append(inputLine);
+                if (!reader.ready()) break;
+            }
+            reader.close();
+            // Assertion
+            assertEquals(fileContent.toString(), response.toString());
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldAddAndGetActivities() {
+        try {
+            String inputLine;
+
+            // Deleting previous activities
+            URL localhost = new URL("http://localhost:23727/app/delete/activities?time=12:00%20AM");
+            localhost.openStream();
+            localhost = new URL("http://localhost:23727/app/delete/activities?time=11:00%20AM");
+            localhost.openStream();
+
+            // Adding the activity
+            localhost = new URL("http://localhost:23727/app/post/activities?time=12:00%20AM&activity=Sleep");
+            localhost.openStream();
+
+            // Reading the response from the URL
+            localhost = new URL("http://localhost:23727/app/get/activities");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(localhost.openStream()));
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = reader.readLine()) != null) {
+                response.append(inputLine);
+                if (!reader.ready()) break;
+            }
+            reader.close();
+
+            // Assertion
+            assertEquals("[{\"time\": \"12:00 AM\", \"activity\": \"Sleep\"}]", response.toString());
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldDeleteActivity() {
+        try {
+            String inputLine;
+
+            // Deleting previous activities
+            URL localhost = new URL("http://localhost:23727/app/delete/activities?time=12:00%20AM");
+            localhost.openStream();
+            localhost = new URL("http://localhost:23727/app/delete/activities?time=11:00%20AM");
+            localhost.openStream();
+
+            // Adding the activities
+            localhost = new URL("http://localhost:23727/app/post/activities?time=12:00%20AM&activity=Sleep");
+            localhost.openStream();
+            localhost = new URL("http://localhost:23727/app/post/activities?time=11:00%20AM&activity=Shower");
+            localhost.openStream();
+
+            // Reading the response from the URL
+            localhost = new URL("http://localhost:23727/app/get/activities");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(localhost.openStream()));
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = reader.readLine()) != null) {
+                response.append(inputLine);
+                if (!reader.ready()) break;
+            }
+            reader.close();
+
+            assertEquals("[{\"time\": \"12:00 AM\", \"activity\": \"Sleep\"}," +
+                                    "{\"time\": \"11:00 AM\", \"activity\": \"Shower\"}]", response.toString());
+
+            // Deleting activity
+            localhost = new URL("http://localhost:23727/app/delete/activities?time=12:00%20AM");
+            localhost.openStream();
+
+            // Reading the response from the URL
+            localhost = new URL("http://localhost:23727/app/get/activities");
+
+
+            reader = new BufferedReader(new InputStreamReader(localhost.openStream()));
+            response = new StringBuilder();
+            while ((inputLine = reader.readLine()) != null) {
+                response.append(inputLine);
+                if (!reader.ready()) break;
+            }
+            reader.close();
+            // Assertion
+            assertEquals("[{\"time\": \"11:00 AM\", \"activity\": \"Shower\"}]", response.toString());
+        } catch (IOException e) {
+            fail();
+        }
+    }
 }
+
+

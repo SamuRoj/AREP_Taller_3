@@ -16,12 +16,4 @@ public class Pair<M, B> {
     public B getSecond() {
         return second;
     }
-
-    @Override
-    public String toString() {
-        return "Pair{" +
-                "first=" + first +
-                ", second=" + second +
-                '}';
-    }
 }

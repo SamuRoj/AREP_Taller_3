@@ -1,8 +1,9 @@
-# Web Framework Development for REST Services and Static File Management
+# Web Framework Development with Reflection, IoC Pattern and Meta Protocol Objects
 
-This project implements a framework that enables the development of web applications with backend REST services.
-It provides developers tools to define REST services using lambda functions, manage query values within
-requests, and specify the location of static files that will be used in the server.
+This project implements a framework designed to serve HTML pages and PNG images. It also offers an Inversion of Control 
+(IoC) framework for building web applications from POJOs (Plain Old Java Objects). Additionally, it provides developer 
+tools to define REST services with custom annotations, manage query parameters within requests, specify the location of 
+static files for the server and includes a small web application for planning daily activities.
 
 ## Getting Started
 
@@ -43,13 +44,13 @@ git --version
 1. Clone the repository to your local machine using Git.
 
 ```
-git clone https://github.com/SamuRoj/AREP_Taller_2.git
+git clone https://github.com/SamuRoj/AREP_Taller_3.git
 ```
 
 2. Navigate to the project directory.
 
 ```
-cd AREP_Taller_2
+cd AREP_Taller_3
 ```
 
 3. Build the project by running the following command:
@@ -61,7 +62,7 @@ mvn clean install
 4. Execute the project with the following command:
 
 ```
-java -cp target/taller-2-1.0-SNAPSHOT.jar edu.escuelaing.arep.app.WebApplication
+java -cp target/taller-3-1.0-SNAPSHOT.jar edu.escuelaing.arep.app.WebApplication
 ```
 
 5. Once the server is running, open your web browser and visit:
@@ -72,69 +73,53 @@ http://localhost:23727/
 
 ## Features of the application
 
-- A get() method that allows developers to define REST services using lambda functions.
+- **Annotations:**
 
-    - To define a new function the main method of the WebApplication class has to be modified with a new call to
-      the get() method and two parameters, the route of the function and the lambda expression.
+  - GetMapping, PostMapping, DeleteMapping: Loads a method into the services that will be offered in and 
+  clarifies the HTTP method used in the request.
 
-  ![GetMethod.png](src/main/resources/img/GetMethod.png)
+  - RequestParam: It's an annotation made for the parameters and contains two values:
+    - value: The name of the parameter to be retrieved from the request.
+    - defaultValue: The value assigned to the parameter in the method if it is not present in the request. 
 
-    - To access it, the URL has to follow the next structure: `http://localhost:23727/app/+<routeAdded>`
+  - RestController: This annotation enables reading files from disk and automatically loads all methods annotated 
+  with any HTTP annotations, making them available as services.
 
-  ![LambdaExample.png](src/main/resources/img/LambdaExample.png)
+- **Static files endpoint:** Allows developers to define the folder where the files would be queried, this
+method can be requested through the following URL with the parameter folder `http://localhost:23727/app/folder?folder=<folder-name>`.
 
-    - There's already some services defined like "/app/hello", "/app/pi" and "/app/e"
+  - By default, this method has the route `static` defined and every request made will be searched within this
+    folder
 
-- A mechanism to extract query parameters from incoming requests and make them accessible within the REST
-  services.
+    ![Staticfiles.png](src/main/resources/img/Staticfiles.png)
 
-    - The request of the petition has a method called getValues(), it receives a parameter, the name of the
-      parameter that would be retrieved from the query made, to test it a request has to be made to the following
-      URL: `http://localhost:23727/app/greeting?<parameter>=<value>&<parameter>=<value>...`
-      The number of parameters can be any, but only one would be retrieved.
+  - The folder can be changed to newFolder, which contains a basic HTML file. To verify the change, a request 
+  has to be made to the following URL: `http://localhost:23727/app/folder?folder=newFolder`.
 
-  ![QueryParameter.png](src/main/resources/img/QueryParameter.png)
+    ![RouteChange.png](src/main/resources/img/RouteChange.png)
+  
+    ![NewWebpage.png](src/main/resources/img/NewWebpage.png)
 
-    - It's already configured to retrieve the parameter name.
-
-  ![QueryTest.png](src/main/resources/img/QueryTest.png)
-
-    - To test another parameter it has to be changed in the method getValues() shown before. In case, the parameter
-      doesn't exist, Not Found will be retrieved.
-
-- A staticfiles() method that allows developers to define the folder where static files would be queried.
-
-    - By default, this method has the route `/static` defined and every request made would be searched in this
-      folder
-
-  ![Staticfiles.png](src/main/resources/img/Staticfiles.png)
-
-    - The folder can be changed to /newFolder, which contains a basic HTML file. To verify the change, the
-      staticfiles() method must be configured to use "/newFolder", and a request should be made to the
-      URL http://localhost:23727/.
-
-  ![RouteChange.png](src/main/resources/img/RouteChange.png)
-  ![NewWebpage.png](src/main/resources/img/NewWebpage.png)
-
-    - The REST services defined with the get() method will continue to be available.
+  - **Note:** The REST services defined within the controllers will continue to be available.
 
 - Query for static files located in the defined folder, to do this just add to the route of the page the name
-  of the file like `http://localhost:23727/styles.css`, it can be made with any file that's located in the
+  of the file like `http://localhost:23727/<filename>`, it can be made with any file that's located in the
   current folder.
 
-![QueryFile.png](src/main/resources/img/QueryFile.png)
+  ![QueryFile.png](src/main/resources/img/QueryFile.png)
 
 - The main page contains a small app that allows the user to add his daily activities through requests methods
   like GET, POST and DELETE, it's made with HTML, CSS and JavaScript to make asynchronous petitions to the server
-  and add new activities to it.
+  and add new activities to it, all the services mentioned before are found in the ApiController.java file through a
+  REST service.
 
-![Webpage.png](src/main/resources/img/Webpage.png)
+  ![Webpage.png](src/main/resources/img/Webpage.png)
 
 ## Architecture
 
 ### Class Diagram
 
-![ClassDiagram.png](src/main/resources/img/ClassDiagram.png)
+  ![ClassDiagram.png](src/main/resources/img/ClassDiagram.png)
 
 ### Classes
 
@@ -148,7 +133,7 @@ http://localhost:23727/
 
 ### Deployment Diagram
 
-![DeploymentDiagram.png](src/main/resources/img/DeploymentDiagram.png)
+  ![DeploymentDiagram.png](src/main/resources/img/DeploymentDiagram.png)
 
 ### Overview
 
@@ -182,11 +167,23 @@ The tests in this file check the functionality of the method getValues() impleme
 
 - Example of test:
 
-![HttpRequestTest.png](src/main/resources/img/HttpRequestTest.png)
+  ![HttpRequestTest.png](src/main/resources/img/HttpRequestTest.png)
 
 - Image of the results:
 
-![HttpRequestTestResults.png](src/main/resources/img/HttpRequestTestResults.png)
+  ![HttpRequestTestResults.png](src/main/resources/img/HttpRequestTestResults.png)
+
+### HttpResponseTest
+
+The tests in this file check the functionality of the method parseValues() implemented in the class.
+
+- Example of test:
+
+  ![HttpResponseTest.png](src/main/resources/img/HttpResponseTest.png)
+
+- Image of the results:
+
+  ![HttpResponseTestResults.png](src/main/resources/img/HttpResponseTestResults.png)
 
 ### HttpServerTest
 
@@ -195,38 +192,38 @@ a valid or invalid answer in case it doesn't exist.
 
 - Example of test:
 
-![MimeType.png](src/main/resources/img/MimeType.png)
+  ![MimeType.png](src/main/resources/img/MimeType.png)
 
 - Image of the results:
 
-![HttpServerTestResults.png](src/main/resources/img/HttpServerTestResults.png)
+  ![HttpServerTestResults.png](src/main/resources/img/HttpServerTestResults.png)
 
 ### WebApplicationTest
 
 The tests in this file runs the application as a thread to check its connectivity and answers to different
-requests for a file like index.html, script.js, styles.css and wallpaper.jpeg. It also verifies the tools to
-define REST services with lambda functions by querying endpoints like `/app/hello`, `/app/pi`, `/app/e` and
-`/app/greeting?name=Samuel`.
+requests for a file like index.html, script.js, styles.css and wallpaper.jpeg. It also verifies the functionality of
+the REST services defined within the controllers with custom annotations by querying endpoints like `/app/hello`, 
+`/app/pi`, `/app/e`, `/app/greeting?name=Samuel`, etc.
 
 - Example of request for a file:
 
     - Starts and finish the server every time a test its executed.
 
-![BeforeAfter.png](src/main/resources/img/BeforeAfter.png)
+      ![BeforeAfter.png](src/main/resources/img/BeforeAfter.png)
 
 - Finds the file locally and makes a query to the server to compare the responses.
 
-![WATestStructure.png](src/main/resources/img/WATestStructure.png)
+  ![WATestStructure.png](src/main/resources/img/WATestStructure.png)
 
 - Example of request for a REST service defined with lambda:
 
     - It makes a request to an endpoint and asserts the answer it's the same as the one already defined.
 
-![RSTestStructure.png](src/main/resources/img/RSTestStructure.png)
+      ![RSTestStructure.png](src/main/resources/img/RSTestStructure.png)
 
 - Image of the results:
 
-![WebApplicationTestResults.png](src/main/resources/img/WebApplicationTestResults.png)
+  ![WebApplicationTestResults.png](src/main/resources/img/WebApplicationTestResults.png)
 
 ## Built With
 

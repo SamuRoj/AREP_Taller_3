@@ -169,4 +169,8 @@ public class HttpServer {
     public static void staticFiles(String path){
         route = "target/classes/" + path;
     }
+
+    public static void stop(){
+        isRunning = false;
+    }
 }

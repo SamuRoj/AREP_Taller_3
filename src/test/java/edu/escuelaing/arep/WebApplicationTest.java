@@ -1,5 +1,6 @@
 package edu.escuelaing.arep;
 
+import edu.escuelaing.arep.http.HttpServer;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
@@ -28,9 +29,14 @@ public class WebApplicationTest {
     }
 
     @AfterAll
-    public static void endServer() throws InterruptedException {
-        webApp.interrupt();
-        webApp.join();
+    public static void endServer() throws InterruptedException, IOException {
+        if (webApp != null && webApp.isAlive()) {
+            HttpServer.stop();
+            URL localhost = new URL("http://localhost:23727/");
+            localhost.openStream();
+            webApp.interrupt();
+            webApp.join();
+        }
     }
 
     @Test
@@ -252,6 +258,10 @@ public class WebApplicationTest {
             reader.close();
             // Assertion
             assertEquals(fileContent.toString(), response.toString());
+
+            // Changing the folder
+            localhost = new URL("http://localhost:23727/app/folder?folder=static");
+            localhost.openStream();
         } catch (IOException e) {
             fail();
         }

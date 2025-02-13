@@ -59,13 +59,19 @@ cd AREP_Taller_3
 mvn clean install
 ```
 
-4. Execute the project with the following command:
+4. Navigate to the following folder:
 
 ```
-java -cp target/taller-3-1.0-SNAPSHOT.jar edu.escuelaing.arep.app.WebApplication
+cd target/classes
 ```
 
-5. Once the server is running, open your web browser and visit:
+5. Execute the project with the following command:
+
+```
+java edu.escuelaing.arep.WebApplication
+```
+
+6. Once the server is running, open your web browser and visit:
 
 ```
 http://localhost:23727/

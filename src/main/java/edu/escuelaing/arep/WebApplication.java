@@ -1,35 +1,33 @@
 package edu.escuelaing.arep;
 
 import edu.escuelaing.arep.annotations.*;
-import edu.escuelaing.arep.http.HttpServer;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import static edu.escuelaing.arep.http.HttpServer.*;
 
 public class WebApplication {
 
     public static void main(String[] args) throws Exception {
         loadComponents();
-        HttpServer.staticFiles("static");
-        HttpServer.start();
+        staticFiles("static");
+        start();
     }
 
-    private static void loadComponents() throws URISyntaxException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+    private static void loadComponents() throws URISyntaxException, ClassNotFoundException {
         // Loading the files from the hard drive
         String packageName = "edu.escuelaing.arep.controller";
         String path = packageName.replace('.', '/');
         URL url = ClassLoader.getSystemResource(path);
-        File directory = new File(url.toURI());
+        File folder = new File(url.toURI());
         List<Class<?>> classes = new ArrayList<>();
 
-        for (File file : directory.listFiles()) {
+        for (File file : folder.listFiles()) {
             if (file.getName().endsWith(".class")) {
                 String className = packageName + '.' + file.getName().replace(".class", "");
                 classes.add(Class.forName(className));

@@ -1,10 +1,10 @@
 package edu.escuelaing.arep.model;
 
-public class Pair<M, B> {
+public class Pair<M, P> {
     private final M first;
-    private final B second;
+    private final P second;
 
-    public Pair(M first, B second){
+    public Pair(M first, P second){
         this.first = first;
         this.second = second;
     }
@@ -13,7 +13,7 @@ public class Pair<M, B> {
         return first;
     }
 
-    public B getSecond() {
+    public P getSecond() {
         return second;
     }
 }

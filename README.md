@@ -53,25 +53,9 @@ git clone https://github.com/SamuRoj/AREP_Taller_3.git
 cd AREP_Taller_3
 ```
 
-3. Build the project by running the following command:
+3. Open and execute the project from an IDE like Intellij.
 
-```
-mvn clean install
-```
-
-4. Navigate to the following folder:
-
-```
-cd target/classes
-```
-
-5. Execute the project with the following command:
-
-```
-java edu.escuelaing.arep.WebApplication
-```
-
-6. Once the server is running, open your web browser and visit:
+4. Once the server is running, open your web browser and visit:
 
 ```
 http://localhost:23727/

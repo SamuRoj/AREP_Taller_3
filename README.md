@@ -75,14 +75,15 @@ http://localhost:23727/
 
 - **Annotations:**
 
-  - GetMapping, PostMapping, DeleteMapping: Loads a method into the services that will be offered in and 
+  - **GetMapping, PostMapping, DeleteMapping:** Loads a method into the services that will be offered in and 
   clarifies the HTTP method used in the request.
+    - value: Defines the route of the endpoint. 
 
-  - RequestParam: It's an annotation made for the parameters and contains two values:
+  - **RequestParam:** It's an annotation made for the parameters and contains two values:
     - value: The name of the parameter to be retrieved from the request.
     - defaultValue: The value assigned to the parameter in the method if it is not present in the request. 
 
-  - RestController: This annotation enables reading files from disk and automatically loads all methods annotated 
+  - **RestController:** This annotation enables reading files from disk and automatically loads all methods annotated 
   with any HTTP annotations, making them available as services.
 
 - **Static files endpoint:** Allows developers to define the folder where the files would be queried, this
@@ -117,20 +118,6 @@ method can be requested through the following URL with the parameter folder `htt
 
 ## Architecture
 
-### Class Diagram
-
-  ![ClassDiagram.png](src/main/resources/img/ClassDiagram.png)
-
-### Classes
-
-- **HTTP Server:** It is responsible for serving the files requested by the client and processing the GET, POST,
-  and DELETE requests it receives.
-- **Web Application:** Starts the HTTP Server, defines some REST services through the get() method and sets up
-  the folder where the files will be searched to `/static`.
-- **HttpRequest:** Parses the query and the path of the request made and has a getValues() method to parse
-  the parameters of the query and returns one of them if it exists.
-- **Activity:** Works as a template to save the activities of the user.
-
 ### Deployment Diagram
 
   ![DeploymentDiagram.png](src/main/resources/img/DeploymentDiagram.png)
@@ -149,9 +136,7 @@ This diagram summarizes the interactions between the client and the HttpServer i
   and DELETE requests it receives, changes the directory of the file and saves the REST services that has been
   added by the developer.
 - **Web Application:** Works as a middleware to connect the HTTP Server and the client, it also defines some
-  REST services and the start route where the files will be searched.
-- **HttpRequest:** Parses the query and the path of the request made and has a getValues() method to parse
-  the parameters of the query and returns one of them if it exists.
+  REST services, loads the components (Controllers) and the route where the files will be searched.
 
 ## Running the tests
 
@@ -207,7 +192,7 @@ the REST services defined within the controllers with custom annotations by quer
 
 - Example of request for a file:
 
-    - Starts and finish the server every time a test its executed.
+    - Starts and finish the server before and after the execution of all tests.
 
       ![BeforeAfter.png](src/main/resources/img/BeforeAfter.png)
 
@@ -215,7 +200,7 @@ the REST services defined within the controllers with custom annotations by quer
 
   ![WATestStructure.png](src/main/resources/img/WATestStructure.png)
 
-- Example of request for a REST service defined with lambda:
+- Example of request for a REST service defined within the controllers:
 
     - It makes a request to an endpoint and asserts the answer it's the same as the one already defined.
 

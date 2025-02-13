@@ -19,16 +19,6 @@ public class ServerController {
         return "Hello " + name;
     }
 
-    @GetMapping("/pi")
-    public static String pi() {
-        return Double.toString(Math.PI);
-    }
-
-    @GetMapping("/e")
-    public static String e() {
-        return Double.toString(Math.E);
-    }
-
     @PostMapping("/folder")
     public static void changeFolder(@RequestParam(value = "folder", defaultValue = "/static") String folder) {
         HttpServer.staticFiles(folder);

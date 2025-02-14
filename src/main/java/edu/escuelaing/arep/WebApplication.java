@@ -3,10 +3,8 @@ package edu.escuelaing.arep;
 import edu.escuelaing.arep.annotations.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import static edu.escuelaing.arep.http.HttpServer.*;
@@ -23,8 +21,7 @@ public class WebApplication {
         // Loading the files from the hard drive
         String packageName = "edu.escuelaing.arep.controller";
         String path = packageName.replace('.', '/');
-        URL url = ClassLoader.getSystemResource(path);
-        File folder = new File(url.toURI());
+        File folder = new File("target/classes/" + path);
         List<Class<?>> classes = new ArrayList<>();
 
         for (File file : folder.listFiles()) {

@@ -11,6 +11,7 @@ import java.lang.reflect.Parameter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class HttpServer {
@@ -21,39 +22,35 @@ public class HttpServer {
     private static Map<String, Pair<Method, LinkedHashMap<String, String>>> services= new HashMap();
     private static boolean isRunning = true;
 
-    public static void start() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started through port " + PORT);
-            while(isRunning){
-                Socket clientSocket = serverSocket.accept();
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String inputLine = "";
-                boolean isFirstLine = true;
-                String file = "";
+    public static void start() throws IOException, InvocationTargetException, IllegalAccessException, URISyntaxException {
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        System.out.println("Server started through port " + PORT);
+        while(isRunning){
+            Socket clientSocket = serverSocket.accept();
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String inputLine = "";
+            boolean isFirstLine = true;
+            String file = "";
 
-                while((inputLine = in.readLine()) != null){
-                    if(isFirstLine){
-                        file = inputLine.split(" ")[1];
-                        isFirstLine = false;
-                    }
-                    if (!in.ready()) break;
+            while((inputLine = in.readLine()) != null){
+                if(isFirstLine){
+                    file = inputLine.split(" ")[1];
+                    isFirstLine = false;
                 }
-
-                URI resourceURI = new URI(file);
-                HttpRequest req = new HttpRequest(resourceURI.getPath(), resourceURI.getQuery());
-                HttpResponse res = new HttpResponse(out);
-                if (req.getPath().startsWith("/app")) processRequest(req, res);
-                else out.println(obtainFile(req, clientSocket.getOutputStream()));
-                in.close();
-                out.close();
-                clientSocket.close();
+                if (!in.ready()) break;
             }
-            serverSocket.close();
-        } catch (Exception e) {
-            System.exit(0);
+
+            URI resourceURI = new URI(file);
+            HttpRequest req = new HttpRequest(resourceURI.getPath(), resourceURI.getQuery());
+            HttpResponse res = new HttpResponse(out);
+            if (req.getPath().startsWith("/app")) processRequest(req, res);
+            else out.println(obtainFile(req, clientSocket.getOutputStream()));
+            in.close();
+            out.close();
+            clientSocket.close();
         }
+        serverSocket.close();
     }
 
     static void processRequest(HttpRequest req, HttpResponse res) throws InvocationTargetException, IllegalAccessException {
